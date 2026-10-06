@@ -1,0 +1,941 @@
+{
+  "info": {
+    "name": "Library API — интеграционное тестирование",
+    "description": "Учебная коллекция: CRUD для книг с цепочкой переменных, негативные сценарии и SOAP-вызовы. Запуск: make newman",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Выполняется после КАЖДОГО запроса коллекции.",
+          "pm.test(\"Has X-Request-ID header\", () => pm.response.to.have.header(\"X-Request-ID\"));",
+          "pm.test(\"Response time < 1000 ms\", () => pm.expect(pm.response.responseTime).to.be.below(1000));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "bookId",
+      "value": ""
+    },
+    {
+      "key": "isbn",
+      "value": ""
+    },
+    {
+      "key": "initialCount",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Service",
+      "item": [
+        {
+          "name": "Health check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Content-Type is JSON\", () => pm.response.to.have.header(\"Content-Type\", \"application/json\"));",
+                  "pm.test(\"Body is {status: ok}\", () => pm.expect(pm.response.json()).to.eql({ status: \"ok\" }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 CRUD flow (create -> read -> update -> delete)",
+      "description": "Запросы выполняются по порядку и передают данные друг другу через переменные коллекции bookId и isbn.",
+      "item": [
+        {
+          "name": "List books",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const bookList = { type: \"array\", items: {\"type\": \"object\", \"required\": [\"id\", \"title\", \"author\", \"year\", \"isbn\", \"available\"], \"additionalProperties\": false, \"properties\": {\"id\": {\"type\": \"integer\"}, \"title\": {\"type\": \"string\", \"minLength\": 1}, \"author\": {\"type\": \"string\", \"minLength\": 1}, \"year\": {\"type\": \"integer\"}, \"isbn\": {\"type\": [\"string\", \"null\"], \"pattern\": \"^97[89]\\\\d{10}$\"}, \"available\": {\"type\": \"boolean\"}}} };",
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Body is an array of books (JSON Schema)\", () => pm.response.to.have.jsonSchema(bookList));",
+                  "pm.collectionVariables.set(\"initialCount\", pm.response.json().length);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create book",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Уникальный ISBN-13 на каждый прогон, чтобы не получить 409 Conflict.",
+                  "let digits = \"\";",
+                  "for (let i = 0; i < 10; i++) digits += Math.floor(Math.random() * 10);",
+                  "pm.collectionVariables.set(\"isbn\", \"978\" + digits);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const bookSchema = {\"type\": \"object\", \"required\": [\"id\", \"title\", \"author\", \"year\", \"isbn\", \"available\"], \"additionalProperties\": false, \"properties\": {\"id\": {\"type\": \"integer\"}, \"title\": {\"type\": \"string\", \"minLength\": 1}, \"author\": {\"type\": \"string\", \"minLength\": 1}, \"year\": {\"type\": \"integer\"}, \"isbn\": {\"type\": [\"string\", \"null\"], \"pattern\": \"^97[89]\\\\d{10}$\"}, \"available\": {\"type\": \"boolean\"}}};",
+                  "pm.test(\"Status 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Location header points to the new book\", () => {",
+                  "    pm.response.to.have.header(\"Location\");",
+                  "    pm.expect(pm.response.headers.get(\"Location\")).to.eql(\"/api/v1/books/\" + pm.response.json().id);",
+                  "});",
+                  "pm.test(\"Body matches Book schema\", () => pm.response.to.have.jsonSchema(bookSchema));",
+                  "pm.test(\"Body echoes sent data\", () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.title).to.eql(\"Тестирование API на практике\");",
+                  "    pm.expect(body.isbn).to.eql(pm.collectionVariables.get(\"isbn\"));",
+                  "});",
+                  "pm.collectionVariables.set(\"bookId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Тестирование API на практике\",\n  \"author\": \"Иван Тестировщиков\",\n  \"year\": 2024,\n  \"isbn\": \"{{isbn}}\",\n  \"available\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get created book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Same id and isbn\", () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.id).to.eql(Number(pm.collectionVariables.get(\"bookId\")));",
+                  "    pm.expect(body.isbn).to.eql(pm.collectionVariables.get(\"isbn\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{bookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{bookId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List grew by one",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"One more book than before\", () => {",
+                  "    pm.expect(pm.response.json().length).to.eql(Number(pm.collectionVariables.get(\"initialCount\")) + 1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create duplicate ISBN -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409 Conflict\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Error body\", () => {",
+                  "    pm.response.to.have.jsonSchema({\"type\": \"object\", \"required\": [\"detail\"], \"properties\": {\"detail\": {\"type\": \"string\"}}});",
+                  "    pm.expect(pm.response.json().detail).to.include(pm.collectionVariables.get(\"isbn\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Дубликат\",\n  \"author\": \"Иван Тестировщиков\",\n  \"year\": 2024,\n  \"isbn\": \"{{isbn}}\",\n  \"available\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update book (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Fields replaced\", () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.title).to.eql(\"Тестирование API. Второе издание\");",
+                  "    pm.expect(body.available).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{bookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{bookId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Тестирование API. Второе издание\",\n  \"author\": \"Иван Тестировщиков\",\n  \"year\": 2024,\n  \"isbn\": \"{{isbn}}\",\n  \"available\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get updated book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Changes are persisted\", () => {",
+                  "    pm.expect(pm.response.json().title).to.eql(\"Тестирование API. Второе издание\");",
+                  "    pm.expect(pm.response.json().available).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{bookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{bookId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204 No Content\", () => pm.response.to.have.status(204));",
+                  "pm.test(\"Empty body\", () => pm.expect(pm.response.text()).to.eql(\"\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{bookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{bookId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get deleted book -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Error message\", () => {",
+                  "    pm.expect(pm.response.json().detail).to.eql(\"Book \" + pm.collectionVariables.get(\"bookId\") + \" not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{bookId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "{{bookId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Negative cases",
+      "item": [
+        {
+          "name": "Create without token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"WWW-Authenticate: Bearer\", () => pm.response.to.have.header(\"WWW-Authenticate\", \"Bearer\"));",
+                  "pm.test(\"Detail\", () => pm.expect(pm.response.json().detail).to.eql(\"Missing Authorization header\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"X\",\n  \"author\": \"Y\",\n  \"year\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Create with wrong token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Detail\", () => pm.expect(pm.response.json().detail).to.eql(\"Invalid token\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"X\",\n  \"author\": \"Y\",\n  \"year\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "wrong-token",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create with invalid body -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 422 Unprocessable Entity\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Validation error schema\", () => pm.response.to.have.jsonSchema({\"type\": \"object\", \"required\": [\"detail\"], \"properties\": {\"detail\": {\"type\": \"array\", \"minItems\": 1, \"items\": {\"type\": \"object\", \"required\": [\"loc\", \"msg\", \"type\"], \"properties\": {\"loc\": {\"type\": \"array\"}, \"msg\": {\"type\": \"string\"}, \"type\": {\"type\": \"string\"}}}}}}));",
+                  "pm.test(\"Every invalid field is reported\", () => {",
+                  "    const fields = pm.response.json().detail.map(e => e.loc[e.loc.length - 1]);",
+                  "    pm.expect(fields).to.include.members([\"title\", \"author\", \"year\", \"isbn\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"year\": \"сто\",\n  \"isbn\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get non-existing book -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Error schema\", () => pm.response.to.have.jsonSchema({\"type\": \"object\", \"required\": [\"detail\"], \"properties\": {\"detail\": {\"type\": \"string\"}}}));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get with non-integer id -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Error points to path param\", () => pm.expect(pm.response.json().detail[0].loc).to.eql([\"path\", \"book_id\"]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "abc"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update non-existing book -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"X\",\n  \"author\": \"Y\",\n  \"year\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete non-existing book -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "books",
+                "999999"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 SOAP (для сравнения с REST)",
+      "item": [
+        {
+          "name": "WSDL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Content-Type is XML\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\"));",
+                  "pm.test(\"Describes GetBook and ListBooks\", () => {",
+                  "    pm.expect(pm.response.text()).to.include('operation name=\"GetBook\"');",
+                  "    pm.expect(pm.response.text()).to.include('operation name=\"ListBooks\"');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/soap?wsdl",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "soap"
+              ],
+              "query": [
+                {
+                  "key": "wsdl",
+                  "value": null
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "GetBook",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is a SOAP envelope with a book\", () => {",
+                  "    const xml = pm.response.text();",
+                  "    pm.expect(xml).to.include(\"<soap:Envelope\");",
+                  "    pm.expect(xml).to.match(/<tns:GetBookResponse><tns:book><tns:id>1<\\/tns:id>/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=utf-8"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "\"http://example.com/library/GetBook\""
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/soap",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "soap"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n               xmlns:tns=\"http://example.com/library\">\n  <soap:Body>\n    <tns:GetBookRequest><tns:id>1</tns:id></tns:GetBookRequest>\n  </soap:Body>\n</soap:Envelope>",
+              "options": {
+                "raw": {
+                  "language": "xml"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "ListBooks",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Contains at least one book\", () => pm.expect(pm.response.text()).to.include(\"<tns:book>\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=utf-8"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "\"http://example.com/library/ListBooks\""
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/soap",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "soap"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n               xmlns:tns=\"http://example.com/library\">\n  <soap:Body>\n    <tns:ListBooksRequest/>\n  </soap:Body>\n</soap:Envelope>",
+              "options": {
+                "raw": {
+                  "language": "xml"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "GetBook not found -> Fault",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"SOAP 1.1 returns HTTP 500 for a Fault\", () => pm.response.to.have.status(500));",
+                  "pm.test(\"soap:Fault with Client code\", () => {",
+                  "    const xml = pm.response.text();",
+                  "    pm.expect(xml).to.include(\"<faultcode>soap:Client</faultcode>\");",
+                  "    pm.expect(xml).to.include(\"<faultstring>Book 999999 not found</faultstring>\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=utf-8"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "\"http://example.com/library/GetBook\""
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/soap",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "soap"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n               xmlns:tns=\"http://example.com/library\">\n  <soap:Body>\n    <tns:GetBookRequest><tns:id>999999</tns:id></tns:GetBookRequest>\n  </soap:Body>\n</soap:Envelope>",
+              "options": {
+                "raw": {
+                  "language": "xml"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
