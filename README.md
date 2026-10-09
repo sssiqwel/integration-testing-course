@@ -141,7 +141,11 @@ make openapi     # обновить openapi/openapi.json после измене
 
 #### Негативная проверка(Без токена):
 
+
 <img width="1514" height="324" alt="curl -i DELETE без заголовка Authorization — 401 Unauthorized" src="https://github.com/user-attachments/assets/38f521a4-36a8-4782-b781-00192c240120" />
+
+
+
 *Негативная проверка: `DELETE /api/v1/books/3` без заголовка `Authorization` → `401 Unauthorized`, заголовок `www-authenticate: Bearer`, тело `{"detail":"Missing Authorization header"}`. Изменяющие запросы без токена отклоняются.*
 
 
