@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class BookIn(BaseModel):
-    """Тело запроса для POST и PUT: все поля книги, кроме id."""
+
 
     model_config = ConfigDict(
         extra="forbid",
