@@ -374,6 +374,8 @@ SOAPAction: "http://example.com/library/GetBook"
 
 
 
+
+
 *Запуск коллекции из командной строки через Newman: папки `01 Service` и `02 CRUD flow`, у каждого запроса статус ответа и пройденные проверки (✓), включая `Location header points to the new book` и `Body matches Book schema`.*
 
 
