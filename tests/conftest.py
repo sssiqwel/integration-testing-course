@@ -16,7 +16,6 @@ API_TOKEN = os.getenv("API_TOKEN", "secret-token")
 
 
 class ApiClient(requests.Session):
-    """requests.Session, который подставляет базовый URL к относительным путям."""
 
     def __init__(self, base_url: str) -> None:
         super().__init__()
@@ -37,7 +36,7 @@ def _is_up(url: str) -> bool:
 
 @pytest.fixture(scope="session")
 def base_url():
-    """Использует уже запущенный сервер или поднимает свой на время сессии тестов."""
+
     if _is_up(BASE_URL):
         yield BASE_URL
         return
@@ -91,7 +90,7 @@ def book_payload():
 
 @pytest.fixture
 def created_book(api, auth_headers, book_payload):
-    """Создаёт книгу перед тестом и удаляет её после (setup / teardown)."""
+
     response = api.post("/api/v1/books", json=book_payload, headers=auth_headers)
     assert response.status_code == 201, response.text
     book = response.json()
