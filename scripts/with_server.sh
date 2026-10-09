@@ -1,7 +1,3 @@
-#!/usr/bin/env bash
-# Запускает API в фоне, ждёт /health, выполняет переданную команду и гасит сервер.
-# Если сервер на порту уже запущен — использует его и не трогает.
-# Пример: scripts/with_server.sh npx --yes newman@6 run postman/library.postman_collection.json
 set -euo pipefail
 
 HOST="${HOST:-127.0.0.1}"
