@@ -245,13 +245,36 @@ SOAPAction: "http://example.com/library/GetBook"
 
 ### 3. Swagger и OpenAPI
 
-**OpenAPI** — формат описания REST API (эндпоинты, параметры, схемы тел, коды ответов, авторизация). **Swagger UI** — интерактивная страница, построенная по этому описанию.
+**Swagger**
 
-FastAPI генерирует спецификацию из кода: типы параметров и Pydantic-модели превращаются в схемы, `responses=` в декораторах — в описания ошибок.
+<img width="1544" height="728" alt="Снимок экрана — 2026-10-09 в 18 33 24" src="https://github.com/user-attachments/assets/0925e658-93ce-4cae-a3e1-2472b086453c" />
 
-- `http://127.0.0.1:8765/docs` — Swagger UI. Нажмите **Authorize**, введите `secret-token`, затем на любом эндпоинте **Try it out → Execute**. Swagger покажет и `curl`-команду, и полный ответ с заголовками.
-- `http://127.0.0.1:8765/redoc` — та же спецификация в виде документации.
-- `http://127.0.0.1:8765/openapi.json` — сама спецификация. Копия лежит в `openapi/openapi.json`; тест `test_exported_openapi_spec_is_up_to_date` и CI падают, если её забыли обновить (`make openapi`).
+**В спецификации заранее описаны тело запроса и все возможные ответы**
+
+<img width="1451" height="708" alt="Снимок экрана — 2026-10-09 в 18 41 33" src="https://github.com/user-attachments/assets/7c6989c7-b2df-4090-a20c-8af12ec6c105" />
+
+
+<img width="1422" height="927" alt="Снимок экрана — 2026-10-09 в 18 41 53" src="https://github.com/user-attachments/assets/fb1e0a99-129d-4d4e-9654-802c76717211" />
+
+
+**Схема описывает поля, типы и обязательность**
+
+<img width="2958" height="798" alt="image" src="https://github.com/user-attachments/assets/695e87c1-901b-448e-a09b-8ca1b8b8f2fe" />
+
+<img width="2844" height="576" alt="image" src="https://github.com/user-attachments/assets/9361eaa1-a25c-4a9a-bc92-cc4b9424d23f" />
+
+**Авторизация**
+<img width="1256" height="566" alt="image" src="https://github.com/user-attachments/assets/80070f3c-2a65-4bcc-90db-0168544e68c5" />
+
+**Выполнение запроса из Swagger**
+
+<img width="2882" height="1418" alt="image" src="https://github.com/user-attachments/assets/c1306d4f-a621-4888-b38c-04ffa607b5ad" />
+
+**OpenAPI**
+В браузере -- http://127.0.0.1:8765/openapi.json
+
+<img width="3244" height="1928" alt="image" src="https://github.com/user-attachments/assets/00051b46-f8ae-4190-b796-512664b2e31d" />
+
 
 Спецификацию можно импортировать в Postman: *Import → openapi/openapi.json* — получится коллекция-заготовка со всеми запросами.
 
