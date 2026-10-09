@@ -43,11 +43,6 @@ make install     # создаст .venv и установит зависимос
 make run         # API на http://127.0.0.1:8765, Swagger UI — http://127.0.0.1:8765/docs
 ```
 
-
-<img width="1498" height="400" alt="image" src="https://github.com/user-attachments/assets/4a3e9ec0-2e3d-4988-803e-fd318ecac517" />
-
-
-
 В другом терминале:
 
 ```bash
@@ -56,6 +51,11 @@ make newman      # Postman-коллекция через Newman (сервер т
 make check       # pytest + newman одной командой
 make openapi     # обновить openapi/openapi.json после изменения API
 ```
+
+
+
+<img width="1498" height="400" alt="image" src="https://github.com/user-attachments/assets/4a3e9ec0-2e3d-4988-803e-fd318ecac517" />
+
 
 <img width="1650" height="920" alt="image" src="https://github.com/user-attachments/assets/ca0f7783-65b6-45a7-b6a0-1eea0b7834a2" />
 
