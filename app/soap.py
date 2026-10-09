@@ -1,9 +1,3 @@
-"""Минимальный SOAP 1.1 сервис (document/literal) поверх того же хранилища.
-
-Написан вручную на xml.etree, чтобы было видно, из чего состоит SOAP-сообщение.
-Описание контракта — в WSDL: GET /soap?wsdl
-"""
-
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 
