@@ -1,7 +1,5 @@
 # Интеграционное тестирование. Основы автоматизации тестирования
 
-Практический проект к курсу. Здесь есть всё, чтобы «пощупать» темы курса руками:
-
 | Тема курса | Где в проекте |
 |---|---|
 | Структура HTTP-запроса и ответа | REST API на FastAPI — `app/main.py`; примеры сырых запросов ниже |
@@ -12,7 +10,7 @@
 | Автоматизация | Тесты на `pytest` + `requests` в `tests/` |
 | CI | GitHub Actions — `.github/workflows/ci.yml` |
 
-Данные хранятся в памяти процесса: после перезапуска сервера библиотека возвращается к трём стартовым книгам. Базы данных нет — ничего ставить не нужно.
+Данные хранятся в памяти процесса: после перезапуска сервера библиотека возвращается к трём стартовым книгам.
 
 ## Структура
 
@@ -38,12 +36,17 @@ Makefile                            Короткие команды для вс�
 
 ## Быстрый старт
 
-Нужны Python 3.12+ и Node.js 18+ (Node — только для Newman).
+Python 3.12+ и Node.js 18+ (Node — только для Newman)
 
 ```bash
 make install     # создаст .venv и установит зависимости из requirements.txt
 make run         # API на http://127.0.0.1:8765, Swagger UI — http://127.0.0.1:8765/docs
 ```
+
+
+<img width="1498" height="400" alt="image" src="https://github.com/user-attachments/assets/4a3e9ec0-2e3d-4988-803e-fd318ecac517" />
+
+
 
 В другом терминале:
 
@@ -54,15 +57,16 @@ make check       # pytest + newman одной командой
 make openapi     # обновить openapi/openapi.json после изменения API
 ```
 
-Без `make`:
+<img width="1650" height="920" alt="image" src="https://github.com/user-attachments/assets/ca0f7783-65b6-45a7-b6a0-1eea0b7834a2" />
 
-```bash
-python3 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --port 8765 --reload
-pytest
-npx newman run postman/library.postman_collection.json -e postman/local.postman_environment.json
-```
+
+<img width="1246" height="752" alt="image" src="https://github.com/user-attachments/assets/234578ca-37e8-44eb-bc71-b236bcd6affd" />
+
+
+
+<img width="480" height="71" alt="Снимок экрана — 2026-10-09 в 17 12 05" src="https://github.com/user-attachments/assets/28b20fc0-63c7-4479-9142-114b43016950" />
+
+
 
 Отчёты в формате JUnit складываются в `reports/` (`pytest.xml`, `newman.xml`).
 
@@ -96,6 +100,14 @@ npx newman run postman/library.postman_collection.json -e postman/local.postman_
 }
 ```
 
+
+<img width="2998" height="1208" alt="image" src="https://github.com/user-attachments/assets/42d29d63-dfb9-4dfc-b16e-6b8ea30cf9f9" />
+
+
+<img width="3282" height="1976" alt="image" src="https://github.com/user-attachments/assets/339254b0-23f9-45c7-a9f8-73a9cd1e13e8" />
+
+
+
 Правила валидации (`app/models.py`): `title` 1–200 символов и не из одних пробелов, `author` 1–100, `year` от 1450 до текущего года, `isbn` — 13 цифр, начинается с 978/979, необязателен и уникален, `available` — boolean (по умолчанию `true`). Неизвестные поля запрещены. `id` назначает сервер.
 
 Каждый ответ содержит заголовок `X-Request-ID`. Если клиент прислал свой `X-Request-ID`, сервер вернёт его же — так запрос удобно искать в логах.
@@ -106,7 +118,36 @@ npx newman run postman/library.postman_collection.json -e postman/local.postman_
 
 ### 1. Анатомия HTTP-запроса и ответа
 
-HTTP — текстовый протокол «запрос → ответ». Ниже реальный обмен с нашим сервером (вывод `curl -v`, сокращён только ответ на создание книги).
+# GET: список книг
+
+<img width="1702" height="422" alt="image" src="https://github.com/user-attachments/assets/c2c9ab75-0271-43bc-b953-a60b76699058" />
+
+# GET: одна книга
+
+<img width="1700" height="380" alt="image" src="https://github.com/user-attachments/assets/11647c38-5a3d-405e-b585-b1285292853b" />
+
+# POST: создать книгу 
+
+<img width="1708" height="750" alt="image" src="https://github.com/user-attachments/assets/508c7ee5-866e-4635-abe2-d1f78514cbed" />
+
+
+# PUT: заменить книгу
+
+<img width="1626" height="820" alt="image" src="https://github.com/user-attachments/assets/4f2e856f-5fff-47f4-80be-ff1c33e57c89" />
+
+
+# DELETE: удалить книгу
+
+<img width="1610" height="230" alt="image" src="https://github.com/user-attachments/assets/25238b1f-ecab-43e7-8e53-dc60f25fce45" />
+
+# Негативная проверка(Без токена):
+
+<img width="1514" height="324" alt="image" src="https://github.com/user-attachments/assets/38f521a4-36a8-4782-b781-00192c240120" />
+
+
+# Негативная проверка(С токеном):
+
+<img width="594" height="248" alt="Снимок экрана — 2026-10-09 в 17 23 41" src="https://github.com/user-attachments/assets/f7ee455c-75ac-403d-aea6-03fdc2c54a90" />
 
 **Запрос:**
 
