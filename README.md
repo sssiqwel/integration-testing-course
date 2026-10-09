@@ -240,7 +240,11 @@ SOAPAction: "http://example.com/library/GetBook"
 
 # Soap  получил первую книгу 
 
+
 <img width="1702" height="524" alt="image" src="https://github.com/user-attachments/assets/f86d134e-fc27-4730-b48d-21dfcd545110" />
+
+
+
 *SOAP: `POST /soap` с `GetBookRequest` (id=1) → `200 OK`, `content-type: text/xml`. В ответе XML-конверт `soap:Envelope/soap:Body/tns:GetBookResponse` с той же книгой «Война и мир». Данные те же, что в REST, но формат — XML-конверт.*
 
 <img width="876" height="72" alt="image" src="https://github.com/user-attachments/assets/b06f1f5a-d75e-4a86-9da7-87a8d3eefde3" />
