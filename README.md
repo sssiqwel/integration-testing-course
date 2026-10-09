@@ -211,7 +211,37 @@ SOAPAction: "http://example.com/library/GetBook"
 | Кеширование | Работает для `GET` из коробки | Практически нет — всё через `POST` |
 | Где встречается | Веб и мобильные API, микросервисы | Банки, госсистемы, интеграции «enterprise» |
 
-Что это значит для тестировщика: в REST проверяем код состояния и JSON; в SOAP код почти всегда 200 или 500, а суть ответа — внутри XML (успешный элемент или `Fault`). Посмотрите `tests/test_soap.py` и папку *04 SOAP* в Postman-коллекции.
+# REST: получил книгу 1 
+
+<img width="1658" height="392" alt="image" src="https://github.com/user-attachments/assets/619a4a19-1685-4337-b1c5-cd1123806b76" />
+
+<img width="1018" height="60" alt="image" src="https://github.com/user-attachments/assets/09def310-481d-431a-8450-726416ed386a" />
+
+
+# Soap  получил первую книгу 
+
+<img width="1702" height="524" alt="image" src="https://github.com/user-attachments/assets/f86d134e-fc27-4730-b48d-21dfcd545110" />
+
+<img width="876" height="72" alt="image" src="https://github.com/user-attachments/assets/b06f1f5a-d75e-4a86-9da7-87a8d3eefde3" />
+
+ # REST: ошибка, книги нет
+
+<img width="958" height="466" alt="image" src="https://github.com/user-attachments/assets/ffddad04-0ebc-4c0e-841f-e47dcc63c537" />
+
+<img width="1168" height="86" alt="image" src="https://github.com/user-attachments/assets/b538db22-eb4c-4358-b97b-283712dd8b77" />
+
+# Soap ошибка,книги нет 
+
+<img width="1674" height="740" alt="image" src="https://github.com/user-attachments/assets/a1d50363-7df0-46e1-8b3d-5eed2bdfee59" />
+
+<img width="1148" height="68" alt="image" src="https://github.com/user-attachments/assets/38d117ff-1343-4725-9443-dfc07901be7a" />
+
+# WSDL-контракт SOAP
+
+<img width="1652" height="920" alt="image" src="https://github.com/user-attachments/assets/17656bf3-094f-4492-b929-47ca88af3ea2" />
+
+
+<img width="1108" height="74" alt="image" src="https://github.com/user-attachments/assets/0a152cfb-e318-47a8-8f93-766ed63aa9f0" />
 
 ### 3. Swagger и OpenAPI
 
