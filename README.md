@@ -275,63 +275,57 @@ SOAPAction: "http://example.com/library/GetBook"
 
 <img width="3244" height="1928" alt="image" src="https://github.com/user-attachments/assets/00051b46-f8ae-4190-b796-512664b2e31d" />
 
-
-Спецификацию можно импортировать в Postman: *Import → openapi/openapi.json* — получится коллекция-заготовка со всеми запросами.
-
-SOAP-эндпоинт намеренно скрыт из OpenAPI: его контракт описывает WSDL.
-
 ### 4. Postman и Newman
 
-Откройте Postman → *Import* → выберите оба файла из `postman/`, справа вверху выберите окружение **Library API — local**.
+**Postman**
 
-Что посмотреть в коллекции:
+**Запросы сгруппированы по сценариям: сервис, CRUD-цепочка, негативные проверки, SOAP**
 
-- **Переменные окружения** `{{baseUrl}}` и `{{token}}` — один и тот же набор запросов можно направить на другой стенд, просто сменив окружение.
-- **Авторизация на уровне коллекции** — Bearer `{{token}}` наследуется всеми запросами. В негативных запросах она переопределена: *No Auth* или неверный токен.
-- **Скрипт коллекции (Tests)** выполняется после каждого запроса: проверяет `X-Request-ID` и время ответа.
-- **Pre-request Script** в *Create book* генерирует уникальный ISBN и кладёт его в переменную `isbn`.
-- **Цепочка** в папке *02 CRUD flow*: *Create* сохраняет `id` из ответа (`pm.collectionVariables.set("bookId", ...)`), следующие запросы используют `{{bookId}}`: прочитать → обновить → удалить → убедиться, что 404.
-- **Проверки** `pm.test(...)`: код (`pm.response.to.have.status`), заголовки (`to.have.header`), схема тела (`to.have.jsonSchema`), значения (`pm.expect(...)`).
+<img width="301" height="139" alt="Снимок экрана — 2026-10-09 в 18 57 02" src="https://github.com/user-attachments/assets/253b56fe-5377-4245-a640-6713cab4db1e" />
 
-Запуск всей коллекции: в Postman — *Run collection*; из консоли — Newman:
 
-```bash
-make newman
-# или напрямую, при запущенном сервере:
-npx newman run postman/library.postman_collection.json -e postman/local.postman_environment.json
-```
+<img width="2052" height="1228" alt="image" src="https://github.com/user-attachments/assets/21f88b7e-e17c-4473-837f-5055612b060c" />
 
-Запросы цепочки зависят друг от друга, поэтому папку *02* нужно запускать целиком и по порядку.
+
+
+<img width="2040" height="1270" alt="image" src="https://github.com/user-attachments/assets/c4f578da-8fee-47cd-aa11-41196cef3c01" />
+
+
+
+<img width="1424" height="1370" alt="image" src="https://github.com/user-attachments/assets/522480fb-9b8a-4293-a533-7f10c196759e" />
+
+
+
+<img width="1440" height="1442" alt="image" src="https://github.com/user-attachments/assets/c5951940-53e0-4fbc-85ab-5bbfaeab2d5a" />
+
+
+
+<img width="1422" height="1374" alt="image" src="https://github.com/user-attachments/assets/b96e72bc-4ab7-4496-a06c-2bf851085940" />
+
+
+
+<img width="1434" height="1366" alt="image" src="https://github.com/user-attachments/assets/ad040dd5-ee6c-473b-a233-e16575563375" />
+
+
+**Newman**
+
+<img width="1262" height="904" alt="image" src="https://github.com/user-attachments/assets/58530f6c-c5b3-426d-9361-728cb42cccea" />
+
+
+
+<img width="1118" height="800" alt="image" src="https://github.com/user-attachments/assets/c6012f8c-9159-456f-a0ff-f472eaa37c20" />
 
 ### 5. Автотесты на pytest
 
-`tests/conftest.py` — общие фикстуры:
 
-- `base_url` (на всю сессию) — проверяет `/health`; если сервер не запущен, стартует `uvicorn` в подпроцессе и гасит его в конце.
-- `api` — `requests.Session` с базовым URL: в тестах пишем просто `api.get("/api/v1/books")`.
-- `auth_headers`, `book_payload` — токен и валидное тело с уникальным ISBN.
-- `created_book` — **setup/teardown**: до `yield` создаёт книгу, после теста удаляет. Тест получает готовые данные и не оставляет мусора.
+<img width="840" height="460" alt="Снимок экрана — 2026-10-09 в 19 54 59" src="https://github.com/user-attachments/assets/1cd94e82-1190-4762-a715-e1e6546cd5cb" />
 
-Тест строится по схеме *Arrange — Act — Assert*:
 
-```python
-def test_get_book_by_id(api, created_book):          # Arrange: книга создана фикстурой
-    response = api.get(f"/api/v1/books/{created_book['id']}")   # Act
+<img width="844" height="458" alt="Снимок экрана — 2026-10-09 в 19 54 31" src="https://github.com/user-attachments/assets/86d57eca-6287-4be4-bb43-dbff6ab763e4" />
 
-    assert response.status_code == 200               # Assert
-    assert response.json() == created_book
-```
 
-`@pytest.mark.parametrize` позволяет одной функцией проверить много негативных случаев — см. `test_create_book_validation_errors_return_422` (12 вариантов невалидного тела).
+<img width="852" height="461" alt="Снимок экрана — 2026-10-09 в 19 54 15" src="https://github.com/user-attachments/assets/a7ee3b73-5c5c-41ac-9814-eb06036a91d3" />
 
-Полезные запуски:
-
-```bash
-pytest -k soap                 # только тесты, в имени которых есть «soap»
-pytest tests/test_books_write.py::test_full_crud_flow
-pytest -x                      # остановиться на первом падении
-BASE_URL=http://stage:8765 pytest   # прогнать тесты против другого стенда
-```
 
 ### 6. CI
 
