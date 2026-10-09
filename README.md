@@ -356,7 +356,10 @@ SOAPAction: "http://example.com/library/GetBook"
 *Негативный запрос `Create with wrong token -> 401`: `POST {{baseUrl}}/api/v1/books` с неверным токеном → `401 Unauthorized`, `{"detail": "Invalid token"}`.*
 
 
+
 <img width="686" height="698" alt="Снимок экрана — 2026-10-09 в 20 03 31" src="https://github.com/user-attachments/assets/25a0038d-b893-422f-939f-fbd34b6dccc4" />
+
+
 
 
 
