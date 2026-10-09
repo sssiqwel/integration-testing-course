@@ -151,7 +151,12 @@ make openapi     # обновить openapi/openapi.json после измене
 
 #### Негативная проверка(С неправильным токеном):
 
+
 <img width="594" height="248" alt="curl -i POST с неверным токеном — 401 Unauthorized, Invalid token" src="https://github.com/user-attachments/assets/f7ee455c-75ac-403d-aea6-03fdc2c54a90" />
+
+
+
+
 *Негативная проверка: `POST /api/v1/books` с `Authorization: Bearer wrong-token` → `401 Unauthorized`, тело `{"detail":"Invalid token"}`. Сервер не только требует заголовок, но и проверяет значение токена.*
 
 Невалидное тело — `422` и список всех найденных проблем, с указанием, где именно (`loc`):
