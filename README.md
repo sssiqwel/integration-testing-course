@@ -87,6 +87,11 @@ make openapi     # обновить openapi/openapi.json после измене
 | GET | `/soap?wsdl` | — | 200, WSDL | — |
 | POST | `/soap` | — | 200, SOAP-ответ | 500 + `soap:Fault` |
 
+<img width="2998" height="1208" alt="image" src="https://github.com/user-attachments/assets/42d29d63-dfb9-4dfc-b16e-6b8ea30cf9f9" />
+
+
+<img width="3282" height="1976" alt="image" src="https://github.com/user-attachments/assets/339254b0-23f9-45c7-a9f8-73a9cd1e13e8" />
+
 Книга:
 
 ```json
@@ -100,17 +105,10 @@ make openapi     # обновить openapi/openapi.json после измене
 }
 ```
 
-
-<img width="2998" height="1208" alt="image" src="https://github.com/user-attachments/assets/42d29d63-dfb9-4dfc-b16e-6b8ea30cf9f9" />
-
-
-<img width="3282" height="1976" alt="image" src="https://github.com/user-attachments/assets/339254b0-23f9-45c7-a9f8-73a9cd1e13e8" />
-
-
-
 Правила валидации (`app/models.py`): `title` 1–200 символов и не из одних пробелов, `author` 1–100, `year` от 1450 до текущего года, `isbn` — 13 цифр, начинается с 978/979, необязателен и уникален, `available` — boolean (по умолчанию `true`). Неизвестные поля запрещены. `id` назначает сервер.
 
 Каждый ответ содержит заголовок `X-Request-ID`. Если клиент прислал свой `X-Request-ID`, сервер вернёт его же — так запрос удобно искать в логах.
+
 
 ---
 
@@ -148,46 +146,6 @@ make openapi     # обновить openapi/openapi.json после измене
 # Негативная проверка(С токеном):
 
 <img width="594" height="248" alt="Снимок экрана — 2026-10-09 в 17 23 41" src="https://github.com/user-attachments/assets/f7ee455c-75ac-403d-aea6-03fdc2c54a90" />
-
-**Запрос:**
-
-```http
-POST /api/v1/books HTTP/1.1                      ← стартовая строка: метод, путь, версия
-Host: 127.0.0.1:8765                             ← заголовки: «ключ: значение»
-Authorization: Bearer secret-token
-Content-Type: application/json                   ← в каком формате тело
-Content-Length: 99                               ← длина тела в байтах
-                                                 ← пустая строка отделяет заголовки от тела
-{"title":"Мастер и Маргарита","author":"Михаил Булгаков","year":1967}
-```
-
-**Ответ:**
-
-```http
-HTTP/1.1 201 Created                             ← статусная строка: версия, код, пояснение
-date: Tue, 06 Oct 2026 16:57:33 GMT
-server: uvicorn
-content-type: application/json
-content-length: 135
-location: /api/v1/books/4                        ← где теперь живёт созданный ресурс
-x-request-id: dda50c91-0790-4f71-b954-22368de9729b
-
-{"title":"Мастер и Маргарита","author":"Михаил Булгаков","year":1967,"isbn":null,"available":true,"id":4}
-```
-
-Запрос несуществующей книги — у `GET` тела нет, но ответ всё равно содержит описание ошибки:
-
-```http
-GET /api/v1/books/42 HTTP/1.1
-Host: 127.0.0.1:8765
-Accept: */*
-
-HTTP/1.1 404 Not Found
-content-type: application/json
-content-length: 30
-
-{"detail":"Book 42 not found"}
-```
 
 Невалидное тело — `422` и список всех найденных проблем, с указанием, где именно (`loc`):
 
@@ -324,3 +282,4 @@ BASE_URL=http://stage:8765 pytest   # прогнать тесты против �
 
 `.github/workflows/ci.yml` на каждый push в `main` и каждый pull request: ставит зависимости, проверяет актуальность `openapi/openapi.json`, поднимает сервер, запускает pytest и Newman, прикладывает отчёты JUnit и лог сервера к запуску.
 
+<img width="3254" height="936" alt="image" src="https://github.com/user-attachments/assets/d379b3a4-258c-4578-8595-fc1ee88d79a7" />
