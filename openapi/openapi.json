@@ -482,7 +482,6 @@
           "year"
         ],
         "title": "BookIn",
-        "description": "Тело запроса для POST и PUT: все поля книги, кроме id.",
         "examples": [
           {
             "author": "Михаил Булгаков",
