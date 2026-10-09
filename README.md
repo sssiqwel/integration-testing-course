@@ -360,9 +360,16 @@ SOAPAction: "http://example.com/library/GetBook"
 *Прогон всей коллекции в Collection Runner с окружением «Library API — local»: 1 итерация за 577 ms, All tests 88, Passed 88, Failed 0, Errors 0. Видны проверки по каждому запросу: статус, заголовок `X-Request-ID`, время ответа, JSON Schema тела.*
 
 
+
+
+
 **Newman**
 
+
 <img width="1262" height="904" alt="image" src="https://github.com/user-attachments/assets/58530f6c-c5b3-426d-9361-728cb42cccea" />
+
+
+
 *Запуск коллекции из командной строки через Newman: папки `01 Service` и `02 CRUD flow`, у каждого запроса статус ответа и пройденные проверки (✓), включая `Location header points to the new book` и `Body matches Book schema`.*
 
 
