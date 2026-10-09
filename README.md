@@ -357,6 +357,10 @@ SOAPAction: "http://example.com/library/GetBook"
 
 
 <img width="686" height="698" alt="Снимок экрана — 2026-10-09 в 20 03 31" src="https://github.com/user-attachments/assets/25a0038d-b893-422f-939f-fbd34b6dccc4" />
+
+
+
+
 *Прогон всей коллекции в Collection Runner с окружением «Library API — local»: 1 итерация за 577 ms, All tests 88, Passed 88, Failed 0, Errors 0. Видны проверки по каждому запросу: статус, заголовок `X-Request-ID`, время ответа, JSON Schema тела.*
 
 
