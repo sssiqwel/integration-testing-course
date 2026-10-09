@@ -1,5 +1,3 @@
-"""Сохраняет OpenAPI-спецификацию приложения в openapi/openapi.json."""
-
 import json
 import sys
 from pathlib import Path
