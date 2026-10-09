@@ -328,7 +328,11 @@ SOAPAction: "http://example.com/library/GetBook"
 
 **Запросы сгруппированы по сценариям: сервис, CRUD-цепочка, негативные проверки, SOAP**
 
+
 <img width="301" height="139" alt="Снимок экрана — 2026-10-09 в 18 57 02" src="https://github.com/user-attachments/assets/253b56fe-5377-4245-a640-6713cab4db1e" />
+
+
+
 *Коллекция Postman «Library API — интеграционное тестирование» разбита на папки: `01 Service`, `02 CRUD flow (create -> read -> update -> delete)`, `03 Negative cases`, `04 SOAP`.*
 
 
