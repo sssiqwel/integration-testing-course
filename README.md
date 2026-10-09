@@ -61,6 +61,8 @@ make openapi     # обновить openapi/openapi.json после измене
 
 <img width="480" height="71" alt="Вывод make openapi: спецификация записана в openapi/openapi.json" src="https://github.com/user-attachments/assets/28b20fc0-63c7-4479-9142-114b43016950" />
 
+
+
 *Команда `make openapi` запускает `scripts/export_openapi.py` и записывает актуальную спецификацию в `openapi/openapi.json` — так файл в репозитории остаётся в соответствии с кодом API.*
 
 
