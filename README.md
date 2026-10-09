@@ -298,7 +298,8 @@ SOAPAction: "http://example.com/library/GetBook"
 
 
 
-<img width="1434" height="1366" alt="image" src="https://github.com/user-attachments/assets/ad040dd5-ee6c-473b-a233-e16575563375" />
+<img width="686" height="698" alt="Снимок экрана — 2026-10-09 в 20 03 31" src="https://github.com/user-attachments/assets/25a0038d-b893-422f-939f-fbd34b6dccc4" />
+
 
 
 **Newman**
@@ -325,4 +326,5 @@ SOAPAction: "http://example.com/library/GetBook"
 
 `.github/workflows/ci.yml` на каждый push в `main` и каждый pull request: ставит зависимости, проверяет актуальность `openapi/openapi.json`, поднимает сервер, запускает pytest и Newman, прикладывает отчёты JUnit и лог сервера к запуску.
 
-<img width="3254" height="936" alt="image" src="https://github.com/user-attachments/assets/d379b3a4-258c-4578-8595-fc1ee88d79a7" />
+<img width="1302" height="370" alt="Снимок экрана — 2026-10-09 в 20 05 29" src="https://github.com/user-attachments/assets/1cb83740-95bb-4a0f-a345-3cf717f4ee15" />
+
