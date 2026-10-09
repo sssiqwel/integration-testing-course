@@ -55,7 +55,9 @@ make openapi     # обновить openapi/openapi.json после измене
 
 
 <img width="1498" height="400" alt="Лог uvicorn: запуск и остановка сервера make run" src="https://github.com/user-attachments/assets/4a3e9ec0-2e3d-4988-803e-fd318ecac517" />
+
 *Запуск API командой `make run`: uvicorn поднялся на `http://127.0.0.1:8765` с `--reload`, затем сервер остановлен по Ctrl+C — видно штатное завершение (`Application shutdown complete`).*
+
 
 
 
