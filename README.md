@@ -427,5 +427,6 @@ SOAPAction: "http://example.com/library/GetBook"
 
 `.github/workflows/ci.yml` на каждый push в `main` и каждый pull request: ставит зависимости, проверяет актуальность `openapi/openapi.json`, поднимает сервер, запускает pytest и Newman, прикладывает отчёты JUnit и лог сервера к запуску.
 
-<img width="1302" height="370" alt="Снимок экрана — 2026-10-09 в 20 05 29" src="https://github.com/user-attachments/assets/1cb83740-95bb-4a0f-a345-3cf717f4ee15" />
+<img width="1323" height="360" alt="Снимок экрана — 2026-10-09 в 21 13 42" src="https://github.com/user-attachments/assets/40cb41ed-102d-44e3-a8c8-b719b139e600" />
+
 *Запуск GitHub Actions по push в `main`: workflow `ci.yml`, job `test` завершился успешно за 22 s (общее время 25 s), Status Success, сохранён 1 артефакт с отчётами.*
