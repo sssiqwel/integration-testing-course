@@ -57,8 +57,6 @@ make openapi     # обновить openapi/openapi.json после измене
 <img width="1498" height="400" alt="image" src="https://github.com/user-attachments/assets/4a3e9ec0-2e3d-4988-803e-fd318ecac517" />
 
 
-<img width="1650" height="920" alt="image" src="https://github.com/user-attachments/assets/ca0f7783-65b6-45a7-b6a0-1eea0b7834a2" />
-
 
 <img width="1246" height="752" alt="image" src="https://github.com/user-attachments/assets/234578ca-37e8-44eb-bc71-b236bcd6affd" />
 
