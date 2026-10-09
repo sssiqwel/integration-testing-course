@@ -380,6 +380,10 @@ SOAPAction: "http://example.com/library/GetBook"
 
 
 <img width="1118" height="800" alt="image" src="https://github.com/user-attachments/assets/c6012f8c-9159-456f-a0ff-f472eaa37c20" />
+
+
+
+
 *Конец прогона Newman: последний запрос `GetBook not found -> Fault` (`500`, проверка `soap:Fault with Client code`) и итоговая таблица — 21 запрос, 42 test-scripts, 88 assertions, в колонке failed везде 0. Коллекция полностью проходит из CLI, так же как в CI.*
 
 
@@ -387,12 +391,28 @@ SOAPAction: "http://example.com/library/GetBook"
 
 
 <img width="840" height="460" alt="Снимок экрана — 2026-10-09 в 19 54 59" src="https://github.com/user-attachments/assets/1cd94e82-1190-4762-a715-e1e6546cd5cb" />
+
+
+
+
 *Запуск `make test`: pytest 8.3.4, конфигурация `pytest.ini`, `testpaths: tests`, собрано 57 тестов. Первые тесты из `test_books_read.py` и `test_books_write.py` (список, фильтры, 404, 422, 401 без токена) — PASSED.*
 
+
+
 <img width="844" height="458" alt="Снимок экрана — 2026-10-09 в 19 54 31" src="https://github.com/user-attachments/assets/86d57eca-6287-4be4-bb43-dbff6ab763e4" />
+
+
+
+
 *Продолжение прогона: параметризованный тест `test_create_book_validation_errors_return_422[...]` для каждого правила валидации (пустой и слишком длинный `title`, неверный `year`, `isbn`, лишнее поле и т. д.), а также `duplicate_isbn_returns_409` и тесты PUT — все PASSED.*
 
+
+
 <img width="852" height="461" alt="Снимок экрана — 2026-10-09 в 19 54 15" src="https://github.com/user-attachments/assets/a7ee3b73-5c5c-41ac-9814-eb06036a91d3" />
+
+
+
+
 *Окончание прогона: тесты DELETE, полный CRUD-сценарий, служебные проверки (`X-Request-ID`, 404/405, Swagger, актуальность `openapi.json`) и SOAP (WSDL, GetBook, ListBooks, Fault). Итог — `57 passed in 0.12s`, JUnit-отчёт записан в `reports/pytest.xml`.*
 
 ### 6. CI
