@@ -13,14 +13,6 @@ NEWMAN      = npx --yes newman@6.2.1 run $(COLLECTION) -e $(ENVIRONMENT) \
 
 .PHONY: help install run test newman check openapi clean
 
-help:
-	@echo "make install  - создать .venv и поставить зависимости"
-	@echo "make run      - запустить API на http://$(HOST):$(PORT) (Swagger: /docs)"
-	@echo "make test     - pytest (сервер поднимется сам, если не запущен)"
-	@echo "make newman   - прогнать Postman-коллекцию через Newman"
-	@echo "make check    - pytest + newman"
-	@echo "make openapi  - выгрузить спецификацию в openapi/openapi.json"
-
 $(VENV)/bin/python:
 	python3 -m venv $(VENV)
 
