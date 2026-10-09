@@ -87,11 +87,6 @@ make openapi     # обновить openapi/openapi.json после измене
 | GET | `/soap?wsdl` | — | 200, WSDL | — |
 | POST | `/soap` | — | 200, SOAP-ответ | 500 + `soap:Fault` |
 
-<img width="2998" height="1208" alt="image" src="https://github.com/user-attachments/assets/42d29d63-dfb9-4dfc-b16e-6b8ea30cf9f9" />
-
-
-<img width="3282" height="1976" alt="image" src="https://github.com/user-attachments/assets/339254b0-23f9-45c7-a9f8-73a9cd1e13e8" />
-
 Книга:
 
 ```json
@@ -157,6 +152,13 @@ make openapi     # обновить openapi/openapi.json после измене
 ]}
 ```
 ### 2. REST и SOAP
+
+**REST:**
+<img width="2998" height="1208" alt="image" src="https://github.com/user-attachments/assets/42d29d63-dfb9-4dfc-b16e-6b8ea30cf9f9" />
+
+**SOAP:**
+<img width="3282" height="1976" alt="image" src="https://github.com/user-attachments/assets/339254b0-23f9-45c7-a9f8-73a9cd1e13e8" />
+
 
 В проекте одни и те же данные отдаются двумя способами. Получить книгу № 1:
 
