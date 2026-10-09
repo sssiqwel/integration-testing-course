@@ -203,7 +203,7 @@ SOAPAction: "http://example.com/library/GetBook"
 | Контракт | Необязателен; обычно OpenAPI (`/openapi.json`) | WSDL (`/soap?wsdl`) — часть стандарта |
 | Ошибки | Коды HTTP: 404, 422… | `soap:Fault` с `faultcode`/`faultstring`, HTTP 500 |
 | Кеширование | Работает для `GET` из коробки | Практически нет — всё через `POST` |
-| Где встречается | Веб и мобильные API, микросервисы | Банки, госсистемы, интеграции «enterprise» |
+
 
 # REST: получил книгу 1 
 
