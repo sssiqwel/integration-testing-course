@@ -123,11 +123,14 @@ make openapi     # обновить openapi/openapi.json после измене
 
 <img width="1700" height="380" alt="curl -i GET /api/v1/books/2 — 200 OK, одна книга" src="https://github.com/user-attachments/assets/11647c38-5a3d-405e-b585-b1285292853b" />
 
+
 *Запрос `curl -i GET /api/v1/books/2` → `200 OK`: в теле один объект книги с `id: 2`, в заголовках — `content-type: application/json` и уникальный `x-request-id`.*
 
 #### POST: создать книгу 
 
 <img width="1708" height="750" alt="curl -i POST /api/v1/books с Bearer-токеном — 201 Created и заголовок Location" src="https://github.com/user-attachments/assets/508c7ee5-866e-4635-abe2-d1f78514cbed" />
+
+
 
 *Создание книги: `POST /api/v1/books` с заголовками `Authorization: Bearer secret-token` и `Content-Type: application/json` → `201 Created`. Заголовок `location: /api/v1/books/4` указывает на новый ресурс, а в теле сервер вернул книгу с присвоенным `id: 4` и значением по умолчанию `available: true`.*
 
@@ -136,12 +139,16 @@ make openapi     # обновить openapi/openapi.json после измене
 
 <img width="1626" height="820" alt="curl -i PUT /api/v1/books/2 — 200 OK, книга полностью заменена" src="https://github.com/user-attachments/assets/4f2e856f-5fff-47f4-80be-ff1c33e57c89" />
 
+
+
 *Полная замена книги: `PUT /api/v1/books/2` с токеном и новым телом → `200 OK`. В ответе обновлённая книга (`"title":"Новое название"`, `"year":2020`), `id` остался прежним — 2.*
 
 
 #### DELETE: удалить книгу
 
 <img width="1610" height="230" alt="curl -i DELETE /api/v1/books/2 — 204 No Content без тела" src="https://github.com/user-attachments/assets/25238b1f-ecab-43e7-8e53-dc60f25fce45" />
+
+
 
 *Удаление: `DELETE /api/v1/books/2` с токеном → `204 No Content`. Тело ответа пустое и нет заголовка `content-type` — значит, удаление прошло успешно.*
 
@@ -160,9 +167,13 @@ make openapi     # обновить openapi/openapi.json после измене
 
 <img width="594" height="248" alt="curl -i POST с неверным токеном — 401 Unauthorized, Invalid token" src="https://github.com/user-attachments/assets/f7ee455c-75ac-403d-aea6-03fdc2c54a90" />
 
+
+
 #### Негативная проверка: невалидное тело запроса
 
 <img width="1714" height="498" alt="image" src="https://github.com/user-attachments/assets/56c2cb77-ec0e-4e21-bce0-f03b6fc08e40" />
+
+
 
 *POST с пустым `title` и годом из будущего → `422 Unprocessable Entity`, сервер перечисляет ошибки валидации*
 
@@ -170,7 +181,10 @@ make openapi     # обновить openapi/openapi.json после измене
 
 <img width="1710" height="452" alt="image" src="https://github.com/user-attachments/assets/f25124a5-86d2-4da1-ad09-8aabb3c804cd" />
 
+
+
 *POST с ISBN, который уже есть у книги «Война и мир» → `409 Conflict`*
+
 
 *Негативная проверка: `POST /api/v1/books` с `Authorization: Bearer wrong-token` → `401 Unauthorized`, тело `{"detail":"Invalid token"}`. Сервер не только требует заголовок, но и проверяет значение токена.*
 
@@ -188,10 +202,15 @@ make openapi     # обновить openapi/openapi.json после измене
 **REST:**
 <img width="1688" height="298" alt="image" src="https://github.com/user-attachments/assets/56c9f9a3-ae33-417e-b0a5-e45a7cfd3c69" />
 
+
+
 *REST-ответ на запрос книги № 1: `HTTP/1.1 200 OK`, `content-type: application/json`, в теле JSON-объект «Война и мир» (Лев Толстой, 1869, `id: 1`). Данные приходят компактным JSON.*
 
 **SOAP:**
+
 <img width="1696" height="384" alt="image" src="https://github.com/user-attachments/assets/dd66c58f-fe37-4c18-847d-5e74f1ec8c0e" />
+
+
 
 *SOAP-ответ на GetBook для той же книги: `HTTP/1.1 200 OK`, `content-type: text/xml`, в теле `soap:Envelope` → `soap:Body` → `tns:GetBookResponse` → `tns:book`. Данные те же, что в REST, но завёрнуты в XML-конверт и заметно длиннее (452 байта против 124).*
 
@@ -249,6 +268,7 @@ SOAPAction: "http://example.com/library/GetBook"
 
 #### REST: получил книгу 1 
 
+
 <img width="1658" height="392" alt="image" src="https://github.com/user-attachments/assets/619a4a19-1685-4337-b1c5-cd1123806b76" />
 
 
@@ -260,6 +280,8 @@ SOAPAction: "http://example.com/library/GetBook"
 
 *Строка из лога uvicorn: сервер принял `GET /api/v1/books/1` и ответил `200 OK`.*
 
+
+
 #### Soap  получил первую книгу 
 
 
@@ -269,41 +291,65 @@ SOAPAction: "http://example.com/library/GetBook"
 
 *SOAP: `POST /soap` с `GetBookRequest` (id=1) → `200 OK`, `content-type: text/xml`. В ответе XML-конверт `soap:Envelope/soap:Body/tns:GetBookResponse` с той же книгой «Война и мир». Данные те же, что в REST, но формат — XML-конверт.*
 
+
+
 <img width="876" height="72" alt="image" src="https://github.com/user-attachments/assets/b06f1f5a-d75e-4a86-9da7-87a8d3eefde3" />
 *Строка из лога uvicorn: SOAP-запрос пришёл как `POST /soap` и получил `200 OK`. Все SOAP-операции идут методом POST на один URL.*
 
 
 #### SOAP: список всех книг (ListBooks)
 
+
 <img width="3254" height="1452" alt="image" src="https://github.com/user-attachments/assets/5e5c16f4-6ca0-4150-ba3a-cadab90b301a" />
+
+
 
 *SOAP ListBooksRequest → `200 OK`, список книг в XML-конверте. Сравните объём с JSON-ответом REST*
 
  # REST: ошибка, книги нет
 
 <img width="958" height="466" alt="image" src="https://github.com/user-attachments/assets/ffddad04-0ebc-4c0e-841f-e47dcc63c537" />
+
+
 *REST: `GET /api/v1/books/9999` → `404 Not Found`, тело `{"detail":"Book 9999 not found"}`. В REST ошибка передаётся HTTP-кодом статуса.*
 
 
 <img width="1168" height="86" alt="image" src="https://github.com/user-attachments/assets/b538db22-eb4c-4358-b97b-283712dd8b77" />
+
+
+
 *Строка из лога uvicorn: `GET /api/v1/books/9999` → `404 Not Found`.*
 
 
 #### Soap ошибка,книги нет 
 
+
 <img width="1674" height="740" alt="image" src="https://github.com/user-attachments/assets/a1d50363-7df0-46e1-8b3d-5eed2bdfee59" />
+
+
 *SOAP: `GetBookRequest` с несуществующим id=9999 → `HTTP/1.1 500 Internal Server Error`, в теле `soap:Fault` с `faultcode` `soap:Client` и `faultstring` «Book 9999 not found». По стандарту SOAP 1.1 ошибка передаётся элементом Fault в конверте и статусом 500.*
 
+
+
 <img width="1148" height="68" alt="image" src="https://github.com/user-attachments/assets/38d117ff-1343-4725-9443-dfc07901be7a" />
+
+
 *Строка из лога uvicorn: `POST /soap` → `500 Internal Server Error`. Это ожидаемый ответ на SOAP Fault, а не падение сервера.*
 
 
 #### WSDL-контракт SOAP
 
+
 <img width="1652" height="920" alt="image" src="https://github.com/user-attachments/assets/17656bf3-094f-4492-b929-47ca88af3ea2" />
+
+
 *Фрагмент WSDL из терминала: XSD-описания `GetBookRequest` (`id` типа `xsd:int`), `GetBookResponse` (`book` типа `tns:Book`), `ListBooksRequest` и `ListBooksResponse` (список книг, `maxOccurs="unbounded"`). Контракт задаёт типы входных и выходных сообщений.*
 
+
+
 <img width="1108" height="74" alt="image" src="https://github.com/user-attachments/assets/0a152cfb-e318-47a8-8f93-766ed63aa9f0" />
+
+
 
 *Строка из лога uvicorn: контракт отдан по `GET /soap?wsdl` со статусом `200 OK`.*
 
@@ -314,38 +360,52 @@ SOAPAction: "http://example.com/library/GetBook"
 
 *Конец WSDL: `binding` задаёт протокол SOAP поверх HTTP, `service` — адрес сервиса `/soap`*
 
+
 ### 3. Swagger и OpenAPI
 
 **Swagger**
 
 <img width="1544" height="728" alt="Снимок экрана — 2026-10-09 в 18 33 24" src="https://github.com/user-attachments/assets/0925e658-93ce-4cae-a3e1-2472b086453c" />
 
+
 *Блок Responses операции `POST /api/v1/books` в Swagger: кроме примера успешного ответа, в спецификации заранее описаны ошибки `401` «Нет токена или токен неверный», `409` «Книга с таким ISBN уже есть» и `422` Validation Error — для каждой указаны тип `application/json` и пример тела.*
 
+
 **В спецификации заранее описаны тело запроса и все возможные ответы**
+
+
 
 <img width="1451" height="708" alt="Снимок экрана — 2026-10-09 в 18 41 33" src="https://github.com/user-attachments/assets/7c6989c7-b2df-4090-a20c-8af12ec6c105" />
 
 
 *Операция `POST /api/v1/books` в Swagger: тело запроса обязательно (`required`), тип `application/json`, подставлен пример книги (Булгаков, «Мастер и Маргарита»). Пример и формат тела берутся из спецификации.*
 
+
 <img width="1422" height="927" alt="Снимок экрана — 2026-10-09 в 18 41 53" src="https://github.com/user-attachments/assets/fb1e0a99-129d-4d4e-9654-802c76717211" />
 
 
 *Результат Execute: Swagger сформировал `curl` с заголовком `Authorization: Bearer secret-token`, сервер ответил `201`, в теле созданная книга с `id: 4`, в заголовках — `location: /api/v1/books/4` и `x-request-id`. Ниже начинается список ответов из спецификации (`201 Successful Response`).*
+
 
 <img width="1413" height="941" alt="Снимок экрана — 2026-10-09 в 20 29 08" src="https://github.com/user-attachments/assets/611da254-8f49-4ff7-9adc-ae7f38f8a876" />
 
 
 *Раздел Schemas: модели `Book`, `BookIn`, `ErrorResponse`, `HTTPValidationError` и `ValidationError`. Все структуры запросов, ответов и ошибок описаны в спецификации.*
 
+
 **Схема описывает поля, типы и обязательность**
+
 
 <img width="2958" height="798" alt="image" src="https://github.com/user-attachments/assets/695e87c1-901b-448e-a09b-8ca1b8b8f2fe" />
 
+
+
 *Раздел Schemas: модели `Book`, `BookIn`, `ErrorResponse`, `HTTPValidationError` и `ValidationError`. Все структуры запросов, ответов и ошибок описаны в спецификации.*
 
+
 <img width="2844" height="576" alt="image" src="https://github.com/user-attachments/assets/9361eaa1-a25c-4a9a-bc92-cc4b9424d23f" />
+
+
 
 *Схема `BookIn` (тело POST и PUT): обязательные поля отмечены `*` — `title` (1–200 символов), `author` (1–100), `year` (≥ 1450); `isbn` (string или null) и `available` (boolean) необязательны; `Additional properties: forbidden`. Те же правила проверяет сервер, при нарушении он отвечает 422.*
 
@@ -354,19 +414,28 @@ SOAPAction: "http://example.com/library/GetBook"
 **Авторизация**
 
 <img width="1256" height="566" alt="image" src="https://github.com/user-attachments/assets/80070f3c-2a65-4bcc-90db-0168544e68c5" />
+
+
 *Окно Authorize: схема `HTTPBearer (http, Bearer)`, подсказка про токен `secret-token` (переменная окружения `API_TOKEN`). После ввода Swagger добавляет заголовок `Authorization` ко всем защищённым запросам.*
 
 
 **Выполнение запроса из Swagger**
 
+
 <img width="2882" height="1418" alt="image" src="https://github.com/user-attachments/assets/c1306d4f-a621-4888-b38c-04ffa607b5ad" />
+
+
 *Запрос из Swagger: `DELETE /api/v1/books/1` с токеном → код `204`. Показаны сгенерированный `curl`, Request URL и заголовки ответа (`date`, `server`, `x-request-id`), тела нет.*
 
 **OpenAPI**
+
 В браузере -- http://127.0.0.1:8765/openapi.json
 
 <img width="3244" height="1928" alt="image" src="https://github.com/user-attachments/assets/00051b46-f8ae-4190-b796-512664b2e31d" />
+
+
 *Спецификация `/openapi.json`: `"openapi": "3.1.0"`, блок `info` (название, описание, версия 1.0.0) и начало `paths` — `/health` и `GET /api/v1/books` с query-параметрами `author` и `available`. По этому файлу строится Swagger UI, и его можно импортировать в Postman.*
+
 
 ### 4. Postman и Newman
 
@@ -383,18 +452,26 @@ SOAPAction: "http://example.com/library/GetBook"
 
 
 <img width="2052" height="1228" alt="image" src="https://github.com/user-attachments/assets/21f88b7e-e17c-4473-837f-5055612b060c" />
+
+
 *Запрос `Create book` из папки CRUD flow: `POST {{baseUrl}}/api/v1/books` → `201 Created`, в теле созданная книга с `id: 5`. Адрес берётся из переменной окружения `{{baseUrl}}`. В сайдбаре видна вся цепочка, включая проверки `-> 409` и `-> 404`.*
 
 
 <img width="2040" height="1270" alt="image" src="https://github.com/user-attachments/assets/c4f578da-8fee-47cd-aa11-41196cef3c01" />
+
+
 *Запрос `Get updated book`: `GET {{baseUrl}}/api/v1/books/{{bookId}}` → `200 OK`. `id` созданной книги передаётся между запросами через переменную `{{bookId}}`.*
 
 
 <img width="1424" height="1370" alt="image" src="https://github.com/user-attachments/assets/522480fb-9b8a-4293-a533-7f10c196759e" />
+
+
 *Запрос `Delete book`: `DELETE {{baseUrl}}/api/v1/books/{{bookId}}` → `204 No Content`, тело пустое. Выбрано окружение «Library API — local».*
 
 
 <img width="1440" height="1442" alt="image" src="https://github.com/user-attachments/assets/c5951940-53e0-4fbc-85ab-5bbfaeab2d5a" />
+
+
 *Запрос `Get deleted book -> 404`: после удаления `GET` той же книги возвращает `404 Not Found` и `{"detail": "Book 5 not found"}` — книга действительно удалена.*
 
 
