@@ -250,10 +250,14 @@ SOAPAction: "http://example.com/library/GetBook"
 #### REST: получил книгу 1 
 
 <img width="1658" height="392" alt="image" src="https://github.com/user-attachments/assets/619a4a19-1685-4337-b1c5-cd1123806b76" />
+
+
 *REST: `GET /api/v1/books/1` → `200 OK`, `content-type: application/json`, в теле книга «Война и мир» (Лев Толстой, 1869). Операцию задают метод и URL ресурса, ответ приходит в JSON.*
 
 
 <img width="1018" height="60" alt="image" src="https://github.com/user-attachments/assets/09def310-481d-431a-8450-726416ed386a" />
+
+
 *Строка из лога uvicorn: сервер принял `GET /api/v1/books/1` и ответил `200 OK`.*
 
 #### Soap  получил первую книгу 
